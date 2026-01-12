@@ -1,5 +1,7 @@
 package com.example.foodordering.user.controller;
 
+import com.example.foodordering.user.dto.LoginRequest;
+import com.example.foodordering.user.dto.LoginResponse;
 import com.example.foodordering.user.dto.UserRegisterRequest;
 import com.example.foodordering.user.dto.UserResponse;
 import com.example.foodordering.user.service.UserService;
@@ -21,5 +23,11 @@ public class UserController {
     public ResponseEntity<UserResponse> register(@RequestBody UserRegisterRequest request) {
         UserResponse response = userService.register(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse response = userService.login(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

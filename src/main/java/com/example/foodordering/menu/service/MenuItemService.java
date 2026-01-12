@@ -1,5 +1,6 @@
 package com.example.foodordering.menu.service;
 
+import com.example.foodordering.common.exception.ResourceNotFoundException;
 import com.example.foodordering.menu.dto.MenuItemRequest;
 import com.example.foodordering.menu.dto.MenuItemResponse;
 import com.example.foodordering.menu.entity.Category;
@@ -23,10 +24,12 @@ public class MenuItemService {
         this.categoryRepository = categoryRepository;
     }
 
+    // create MenuItem
     public MenuItemResponse create(MenuItemRequest request) {
-
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "id", request.getCategoryId())
+                );
 
         MenuItem item = new MenuItem();
         item.setName(request.getName());
@@ -35,32 +38,34 @@ public class MenuItemService {
         item.setCategory(category);
 
         MenuItem savedItem = menuItemRepository.save(item);
-
         return mapToResponse(savedItem);
     }
 
+    // get all MenuItems
     public List<MenuItemResponse> getAll() {
         List<MenuItem> items = menuItemRepository.findAll();
         List<MenuItemResponse> responses = new ArrayList<>();
-
         for (MenuItem item : items) {
             responses.add(mapToResponse(item));
         }
-
         return responses;
     }
 
+    // get MenuItems by Category
     public List<MenuItemResponse> getByCategory(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new ResourceNotFoundException("Category", "id", categoryId);
+        }
+
         List<MenuItem> items = menuItemRepository.findByCategoryId(categoryId);
         List<MenuItemResponse> responses = new ArrayList<>();
-
         for (MenuItem item : items) {
             responses.add(mapToResponse(item));
         }
-
         return responses;
     }
 
+    // convert from Entity to DTO
     private MenuItemResponse mapToResponse(MenuItem item) {
         MenuItemResponse response = new MenuItemResponse();
         response.setId(item.getId());

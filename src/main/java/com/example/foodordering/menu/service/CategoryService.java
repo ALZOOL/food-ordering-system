@@ -1,5 +1,6 @@
 package com.example.foodordering.menu.service;
 
+import com.example.foodordering.common.exception.ResourceNotFoundException;
 import com.example.foodordering.menu.entity.Category;
 import com.example.foodordering.menu.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -15,19 +16,20 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category createCategory(String name) {
-
-        if (categoryRepository.existsByName(name)) {
-            throw new RuntimeException("Category already exists");
-        }
-
-        Category category = new Category();
-        category.setName(name);
-
-        return categoryRepository.save(category);
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "id", id)
+                );
     }
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    public Category createCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+        return categoryRepository.save(category);
     }
 }
